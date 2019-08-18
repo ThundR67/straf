@@ -96,7 +96,7 @@ func getFieldType(objectType reflect.Type) (graphql.Output, error) {
 	return convertSimpleType(objectType)
 }
 
-//convertSimpleType converts simple type or slice of simple type to graphql field
+//convertSimpleType converts simple type  to graphql field
 func convertSimpleType(objectType reflect.Type) (*graphql.Scalar, error) {
 
 	typeMap := map[reflect.Kind]*graphql.Scalar{
