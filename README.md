@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/SonicRoshan/straf)](https://goreportcard.com/report/github.com/SonicRoshan/straf)
+
 # Straf
 Convert Golang Struct To GraphQL Object On The Fly
 

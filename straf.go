@@ -57,7 +57,7 @@ func convertStruct(objectType reflect.Type) (graphql.Fields, error) {
 
 	for i := 0; i < objectType.NumField(); i++ {
 		currentField := objectType.Field(i)
-		fieldType, err := getFieldType(currentField.Type)
+		fieldType, err := getFieldType(currentField)
 		if err != nil {
 			err = fmt.Errorf(
 				"Error while converting type %v to graphQL Type: %v",
@@ -68,8 +68,10 @@ func convertStruct(objectType reflect.Type) (graphql.Fields, error) {
 		}
 
 		fields[currentField.Name] = &graphql.Field{
-			Name: currentField.Name,
-			Type: fieldType,
+			Name:              currentField.Name,
+			Type:              fieldType,
+			DeprecationReason: getTagValue(currentField, "deprecationReason"),
+			Description:       getTagValue(currentField, "description"),
 		}
 	}
 
@@ -77,8 +79,14 @@ func convertStruct(objectType reflect.Type) (graphql.Fields, error) {
 }
 
 //getFieldType Converts object to a graphQL field type
-func getFieldType(objectType reflect.Type) (graphql.Output, error) {
+func getFieldType(object reflect.StructField) (graphql.Output, error) {
 
+	isID, ok := object.Tag.Lookup("ID")
+	if isID == "true" && ok {
+		return graphql.ID, nil
+	}
+
+	objectType := object.Type
 	if objectType.Kind() == reflect.Struct {
 		return convertStructToObject(objectType)
 
@@ -119,4 +127,14 @@ func convertSimpleType(objectType reflect.Type) (*graphql.Scalar, error) {
 	}
 
 	return graphqlType, nil
+}
+
+//getTagValue returns tag value of a struct
+func getTagValue(objectType reflect.StructField, tagName string) string {
+	tag := objectType.Tag
+	reason, ok := tag.Lookup(tagName)
+	if !ok {
+		return ""
+	}
+	return reason
 }

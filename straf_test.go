@@ -18,9 +18,11 @@ type colors struct {
 }
 
 type user struct {
-	UserID    int
+	UserID    int `description:"UserID"`
 	ExtraData extra
 	FavColors []colors
+	Age       int    `deprecationReason:"Age is now in ExtraData"`
+	ID        string `ID:"true"`
 }
 
 //Tests generation of graphQL Object from struct
@@ -42,6 +44,13 @@ func TestGraphQLObjectGen(t *testing.T) {
 	)
 
 	testField(
+		"ID",
+		*graphQLObject.Fields()["ID"],
+		graphql.ID,
+		*assert,
+	)
+
+	testField(
 		"ExtraData",
 		*graphQLObject.Fields()["ExtraData"],
 		extraType,
@@ -54,6 +63,9 @@ func TestGraphQLObjectGen(t *testing.T) {
 		graphql.NewList(colorType),
 		*assert,
 	)
+
+	assert.Equal(graphQLObject.Fields()["Age"].DeprecationReason, "Age is now in ExtraData")
+	assert.Equal(graphQLObject.Fields()["UserID"].Description, "UserID")
 
 }
 
