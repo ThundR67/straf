@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/graphql-go/graphql"
 )
@@ -56,86 +57,66 @@ func convertStruct(objectType reflect.Type) (graphql.Fields, error) {
 
 	for i := 0; i < objectType.NumField(); i++ {
 		currentField := objectType.Field(i)
-
-		if currentField.Type.Kind() == reflect.Struct {
-			graphqlObject, err := convertStructToObject(currentField.Type)
-			if err != nil {
-				err = fmt.Errorf(
-					"Error while converting type %v to graphql object: %v",
-					currentField.Type,
-					err,
-				)
-				return graphql.Fields{}, err
-			}
-
-			fields[currentField.Name] = &graphql.Field{
-				Name: currentField.Name,
-				Type: graphqlObject,
-			}
-		} else if currentField.Type.Kind() == reflect.Slice &&
-			currentField.Type.Elem().Kind() == reflect.Struct {
-
-			graphqlObject, err := convertStructToObject(currentField.Type.Elem())
-			if err != nil {
-				err = fmt.Errorf(
-					"Error while converting slice type %v to graphql object: %v",
-					currentField.Type,
-					err,
-				)
-				return graphql.Fields{}, err
-			}
-
-			fields[currentField.Name] = &graphql.Field{
-				Name: currentField.Name,
-				Type: graphql.NewList(graphqlObject),
-			}
-
-		} else {
-			field, err := convertSimpleType(
+		fieldType, err := getFieldType(currentField.Type)
+		if err != nil {
+			err = fmt.Errorf(
+				"Error while converting type %v to graphQL Type: %v",
 				currentField.Type,
-				currentField.Type.Kind() == reflect.Slice,
+				err,
 			)
-			if err != nil {
-				return nil, err
-			}
-			fields[currentField.Name] = field
+			return graphql.Fields{}, err
+		}
+
+		fields[currentField.Name] = &graphql.Field{
+			Name: currentField.Name,
+			Type: fieldType,
 		}
 	}
 
 	return fields, nil
 }
 
-//convertSimpleType converts simple type or slice of simple type to graphql field
-func convertSimpleType(objectType reflect.Type, isList bool) (*graphql.Field, error) {
+//getFieldType Converts object to a graphQL field type
+func getFieldType(objectType reflect.Type) (graphql.Output, error) {
 
-	if isList {
-		objectType = objectType.Elem()
+	if objectType.Kind() == reflect.Struct {
+		return convertStructToObject(objectType)
+
+	} else if objectType.Kind() == reflect.Slice &&
+		objectType.Elem().Kind() == reflect.Struct {
+
+		elemType, err := convertStructToObject(objectType.Elem())
+		return graphql.NewList(elemType), err
+
+	} else if objectType.Kind() == reflect.Slice {
+		elemType, err := convertSimpleType(objectType.Elem())
+		return graphql.NewList(elemType), err
 	}
 
+	return convertSimpleType(objectType)
+}
+
+//convertSimpleType converts simple type or slice of simple type to graphql field
+func convertSimpleType(objectType reflect.Type) (*graphql.Scalar, error) {
+
 	typeMap := map[reflect.Kind]*graphql.Scalar{
-		reflect.String:  graphql.String,
-		reflect.Bool:    graphql.Boolean,
-		reflect.Int:     graphql.Int,
-		reflect.Int8:    graphql.Int,
-		reflect.Int16:   graphql.Int,
-		reflect.Int32:   graphql.Int,
-		reflect.Int64:   graphql.Int,
-		reflect.Float32: graphql.Float,
-		reflect.Float64: graphql.Float,
+		reflect.String:                     graphql.String,
+		reflect.Bool:                       graphql.Boolean,
+		reflect.Int:                        graphql.Int,
+		reflect.Int8:                       graphql.Int,
+		reflect.Int16:                      graphql.Int,
+		reflect.Int32:                      graphql.Int,
+		reflect.Int64:                      graphql.Int,
+		reflect.Float32:                    graphql.Float,
+		reflect.Float64:                    graphql.Float,
+		reflect.TypeOf(time.Time{}).Kind(): graphql.DateTime,
 	}
 
 	graphqlType, ok := typeMap[objectType.Kind()]
 
-	if !ok && !isList {
-		return &graphql.Field{}, errors.New("Invalid Type")
-
-	} else if !isList {
-		return &graphql.Field{
-			Type: graphqlType,
-		}, nil
+	if !ok {
+		return &graphql.Scalar{}, errors.New("Invalid Type")
 	}
 
-	return &graphql.Field{
-		Type: graphql.NewList(graphqlType),
-	}, nil
+	return graphqlType, nil
 }
