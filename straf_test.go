@@ -22,7 +22,7 @@ type user struct {
 	ExtraData extra
 	FavColors []colors
 	Age       int    `deprecationReason:"Age is now in ExtraData"`
-	ID        string `ID:"true"`
+	ID        string `unique:"true"`
 }
 
 //Tests generation of graphQL Object from struct

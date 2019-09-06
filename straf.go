@@ -81,7 +81,7 @@ func convertStruct(objectType reflect.Type) (graphql.Fields, error) {
 //getFieldType Converts object to a graphQL field type
 func getFieldType(object reflect.StructField) (graphql.Output, error) {
 
-	isID, ok := object.Tag.Lookup("ID")
+	isID, ok := object.Tag.Lookup("unique")
 	if isID == "true" && ok {
 		return graphql.ID, nil
 	}
@@ -132,9 +132,9 @@ func convertSimpleType(objectType reflect.Type) (*graphql.Scalar, error) {
 //getTagValue returns tag value of a struct
 func getTagValue(objectType reflect.StructField, tagName string) string {
 	tag := objectType.Tag
-	reason, ok := tag.Lookup(tagName)
+	value, ok := tag.Lookup(tagName)
 	if !ok {
 		return ""
 	}
-	return reason
+	return value
 }
