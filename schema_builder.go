@@ -6,6 +6,16 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
+//NewSchemaBuilder is used get a new schema builder
+func NewSchemaBuilder(graphQLType graphql.Output, object interface{}) *SchemaBuilder {
+	builder := SchemaBuilder{
+		GraphQLType: graphQLType,
+		Object:      object,
+	}
+	builder.Init()
+	return &builder
+}
+
 //SchemaBuilder is used to build a schema based on a struct
 type SchemaBuilder struct {
 	GraphQLType graphql.Output
