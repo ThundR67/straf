@@ -1,8 +1,8 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/SonicRoshan/straf)](https://goreportcard.com/report/github.com/SonicRoshan/straf)
 
 # Straf
-Convert Golang Struct To GraphQL Object On The Fly
-
+1. Convert Golang Struct To GraphQL Object On The Fly
+2. Easily Create GraphQL Schemas
 
 ## Example
 
@@ -29,7 +29,7 @@ func main() {
 ```
 
 
-### Converting struct to GraphQL Object
+### Using The Schema Builder
 ```go
 type User struct {
     UserID int `isArg:"true"` //You can use isArg tag to define a field as a graphql argument
