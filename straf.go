@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"time"
 
 	"github.com/graphql-go/graphql"
 )
@@ -108,16 +107,15 @@ func getFieldType(object reflect.StructField) (graphql.Output, error) {
 func convertSimpleType(objectType reflect.Type) (*graphql.Scalar, error) {
 
 	typeMap := map[reflect.Kind]*graphql.Scalar{
-		reflect.String:                     graphql.String,
-		reflect.Bool:                       graphql.Boolean,
-		reflect.Int:                        graphql.Int,
-		reflect.Int8:                       graphql.Int,
-		reflect.Int16:                      graphql.Int,
-		reflect.Int32:                      graphql.Int,
-		reflect.Int64:                      graphql.Int,
-		reflect.Float32:                    graphql.Float,
-		reflect.Float64:                    graphql.Float,
-		reflect.TypeOf(time.Time{}).Kind(): graphql.DateTime,
+		reflect.String:  graphql.String,
+		reflect.Bool:    graphql.Boolean,
+		reflect.Int:     graphql.Int,
+		reflect.Int8:    graphql.Int,
+		reflect.Int16:   graphql.Int,
+		reflect.Int32:   graphql.Int,
+		reflect.Int64:   graphql.Int,
+		reflect.Float32: graphql.Float,
+		reflect.Float64: graphql.Float,
 	}
 
 	graphqlType, ok := typeMap[objectType.Kind()]
