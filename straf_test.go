@@ -1,6 +1,7 @@
 package straf
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/graphql-go/graphql"
@@ -76,5 +77,22 @@ func testField(name string,
 
 	assert.Equal(definition.Name, name)
 	assert.Equal(definition.Type, graphqlType)
+}
 
+func TestConvertSimpleType(t *testing.T) {
+	assert := assert.New(t)
+
+	userType := reflect.TypeOf(user{})
+	scalar, err := convertSimpleType(userType)
+	assert.Error(err)
+	assert.Equal(&graphql.Scalar{}, scalar)
+}
+
+func TestGetTagValue(t *testing.T) {
+	assert := assert.New(t)
+
+	userType := reflect.TypeOf(user{})
+	field, _ := userType.FieldByName("UserID")
+	assert.Equal("", getTagValue(field, "random"))
+	assert.Equal("UserID", getTagValue(field, "description"))
 }
