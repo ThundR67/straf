@@ -25,8 +25,7 @@ func TestSchemaBuilder(t *testing.T) {
 	assert := assert.New(t)
 	graphQLObject, _ := GetGraphQLObject(user2{})
 	builder := SchemaBuilder{GraphQLType: graphQLObject, Object: user2{}}
-	err := builder.Init()
-	assert.NoError(err)
+	builder.Init()
 	builder.AddFunction("create", "des", handler)
 
 	assert.Contains(builder.Schema, "create")

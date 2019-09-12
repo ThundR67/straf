@@ -25,11 +25,11 @@ type SchemaBuilder struct {
 }
 
 //Init initializes
-func (schemaBuilder *SchemaBuilder) Init() error {
-	args, err := getArgs(schemaBuilder.Object)
+func (schemaBuilder *SchemaBuilder) Init() {
+	args := getArgs(schemaBuilder.Object)
 	schemaBuilder.args = args
 	schemaBuilder.Schema = graphql.Fields{}
-	return err
+	return
 }
 
 //AddFunction adds a function
@@ -46,7 +46,7 @@ func (schemaBuilder *SchemaBuilder) AddFunction(
 	}
 }
 
-func getArgs(object interface{}) (graphql.FieldConfigArgument, error) {
+func getArgs(object interface{}) graphql.FieldConfigArgument {
 	objectType := reflect.TypeOf(object)
 	output := graphql.FieldConfigArgument{}
 
@@ -55,10 +55,7 @@ func getArgs(object interface{}) (graphql.FieldConfigArgument, error) {
 		identifier, ok := currentField.Tag.Lookup("isArg")
 
 		if identifier == "true" && ok {
-			fieldType, err := getFieldType(currentField)
-			if err != nil {
-				return graphql.FieldConfigArgument{}, err
-			}
+			fieldType := getFieldType(currentField)
 			output[currentField.Name] = &graphql.ArgumentConfig{
 				Type:        fieldType,
 				Description: getTagValue(currentField, "description"),
@@ -67,5 +64,5 @@ func getArgs(object interface{}) (graphql.FieldConfigArgument, error) {
 		}
 	}
 
-	return output, nil
+	return output
 }

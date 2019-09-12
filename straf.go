@@ -2,7 +2,6 @@ package straf
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 
 	"github.com/graphql-go/graphql"
@@ -11,7 +10,7 @@ import (
 //GetGraphQLObject Converts struct into graphql object
 func GetGraphQLObject(object interface{}) (*graphql.Object, error) {
 	objectType := reflect.TypeOf(object)
-	fields, err := convertStruct(objectType)
+	fields := convertStruct(objectType)
 
 	output := graphql.NewObject(
 		graphql.ObjectConfig{
@@ -20,51 +19,30 @@ func GetGraphQLObject(object interface{}) (*graphql.Object, error) {
 		},
 	)
 
-	if err != nil {
-		err = fmt.Errorf("Error While Converting Struct To GraphQL Object: %v", err)
-		return &graphql.Object{}, err
-	}
-
 	return output, nil
 }
 
 //convertStructToObject converts simple struct to graphql object
 func convertStructToObject(
-	objectType reflect.Type) (*graphql.Object, error) {
+	objectType reflect.Type) *graphql.Object {
 
-	fields, err := convertStruct(objectType)
-	if err != nil {
-		err = fmt.Errorf(
-			"Error while converting type %v to graphql fields: %v",
-			objectType,
-			err,
-		)
-		return &graphql.Object{}, err
-	}
+	fields := convertStruct(objectType)
 
 	return graphql.NewObject(
 		graphql.ObjectConfig{
 			Name:   objectType.Name(),
 			Fields: fields,
 		},
-	), nil
+	)
 }
 
 //convertStruct converts struct to graphql fields
-func convertStruct(objectType reflect.Type) (graphql.Fields, error) {
+func convertStruct(objectType reflect.Type) graphql.Fields {
 	fields := graphql.Fields{}
 
 	for i := 0; i < objectType.NumField(); i++ {
 		currentField := objectType.Field(i)
-		fieldType, err := getFieldType(currentField)
-		if err != nil {
-			err = fmt.Errorf(
-				"Error while converting type %v to graphQL Type: %v",
-				currentField.Type,
-				err,
-			)
-			return graphql.Fields{}, err
-		}
+		fieldType := getFieldType(currentField)
 
 		fields[currentField.Name] = &graphql.Field{
 			Name:              currentField.Name,
@@ -74,15 +52,15 @@ func convertStruct(objectType reflect.Type) (graphql.Fields, error) {
 		}
 	}
 
-	return fields, nil
+	return fields
 }
 
 //getFieldType Converts object to a graphQL field type
-func getFieldType(object reflect.StructField) (graphql.Output, error) {
+func getFieldType(object reflect.StructField) graphql.Output {
 
 	isID, ok := object.Tag.Lookup("unique")
 	if isID == "true" && ok {
-		return graphql.ID, nil
+		return graphql.ID
 	}
 
 	objectType := object.Type
@@ -92,15 +70,16 @@ func getFieldType(object reflect.StructField) (graphql.Output, error) {
 	} else if objectType.Kind() == reflect.Slice &&
 		objectType.Elem().Kind() == reflect.Struct {
 
-		elemType, err := convertStructToObject(objectType.Elem())
-		return graphql.NewList(elemType), err
+		elemType := convertStructToObject(objectType.Elem())
+		return graphql.NewList(elemType)
 
 	} else if objectType.Kind() == reflect.Slice {
-		elemType, err := convertSimpleType(objectType.Elem())
-		return graphql.NewList(elemType), err
+		elemType, _ := convertSimpleType(objectType.Elem())
+		return graphql.NewList(elemType)
 	}
 
-	return convertSimpleType(objectType)
+	output, _ := convertSimpleType(objectType)
+	return output
 }
 
 //convertSimpleType converts simple type  to graphql field

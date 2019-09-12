@@ -85,6 +85,7 @@ func TestConvertSimpleType(t *testing.T) {
 	userType := reflect.TypeOf(user{})
 	scalar, err := convertSimpleType(userType)
 	assert.Error(err)
+	assert.Equal("Invalid Type", err.Error())
 	assert.Equal(&graphql.Scalar{}, scalar)
 }
 
