@@ -1,4 +1,4 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/SonicRoshan/straf)](https://goreportcard.com/report/github.com/SonicRoshan/straf)
+[![Go Report Card](https://goreportcard.com/badge/github.com/SonicRoshan/straf)](https://goreportcard.com/report/github.com/SonicRoshan/straf) [![GoDoc](https://godoc.org/github.com/SonicRoshan/straf?status.svg)](https://godoc.org/github.com/SonicRoshan/straf) [![GoCover](https://gocover.io/_badge/github.com/SonicRoshan/straf)](https://gocover.io/github.com/SonicRoshan/straf)
 
 # Straf
 1. Convert Golang Struct To GraphQL Object On The Fly
