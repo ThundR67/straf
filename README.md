@@ -17,6 +17,7 @@ type User struct {
     UserID int
     Username string `unique:"true"` // You can use unique tag to define if a field would be unique
     Extra UserExtra
+    Password string `exclude:"true"` //You can use exclude tag to exclude a field
 }
 
 

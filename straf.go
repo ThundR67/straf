@@ -43,12 +43,13 @@ func convertStruct(objectType reflect.Type) graphql.Fields {
 	for i := 0; i < objectType.NumField(); i++ {
 		currentField := objectType.Field(i)
 		fieldType := getFieldType(currentField)
-
-		fields[currentField.Name] = &graphql.Field{
-			Name:              currentField.Name,
-			Type:              fieldType,
-			DeprecationReason: getTagValue(currentField, "deprecationReason"),
-			Description:       getTagValue(currentField, "description"),
+		if getTagValue(currentField, "exclude") != "true" {
+			fields[currentField.Name] = &graphql.Field{
+				Name:              currentField.Name,
+				Type:              fieldType,
+				DeprecationReason: getTagValue(currentField, "deprecationReason"),
+				Description:       getTagValue(currentField, "description"),
+			}
 		}
 	}
 
