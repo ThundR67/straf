@@ -6,7 +6,7 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
-//NewSchemaBuilder is used get a new schema builder
+// NewSchemaBuilder is used get a new schema builder
 func NewSchemaBuilder(graphQLType graphql.Output, objects []interface{}) *SchemaBuilder {
 	builder := SchemaBuilder{
 		GraphQLType: graphQLType,
@@ -16,7 +16,7 @@ func NewSchemaBuilder(graphQLType graphql.Output, objects []interface{}) *Schema
 	return &builder
 }
 
-//SchemaBuilder is used to build a schema based on a struct
+// SchemaBuilder is used to build a schema based on a struct
 type SchemaBuilder struct {
 	GraphQLType graphql.Output
 	Objects     []interface{}
@@ -24,7 +24,7 @@ type SchemaBuilder struct {
 	args        graphql.FieldConfigArgument
 }
 
-//Init initializes
+// Init initializes
 func (schemaBuilder *SchemaBuilder) Init() {
 	args := graphql.FieldConfigArgument{}
 	for _, object := range schemaBuilder.Objects {
@@ -37,7 +37,7 @@ func (schemaBuilder *SchemaBuilder) Init() {
 	return
 }
 
-//AddFunction adds a function
+// AddFunction adds a function
 func (schemaBuilder *SchemaBuilder) AddFunction(
 	name,
 	description string,
