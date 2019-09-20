@@ -40,7 +40,7 @@ type User struct {
 var database []User = []User{}
 
 func main() {
-    //GetGraphQLObject will convert golang struct to a graphQL object
+    // GetGraphQLObject will convert golang struct to a graphQL object
     userType, err := straf.GetGraphQLObject(User{})
 
     builder := straf.NewSchemaBuilder(userType, []interface{User{}, Object2}) // You can add multiple objects to schema builder
