@@ -7,7 +7,7 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
-//GetGraphQLObject Converts struct into graphql object
+// GetGraphQLObject Converts struct into graphql object
 func GetGraphQLObject(object interface{}) (*graphql.Object, error) {
 	objectType := reflect.TypeOf(object)
 	fields := convertStruct(objectType)
@@ -22,7 +22,7 @@ func GetGraphQLObject(object interface{}) (*graphql.Object, error) {
 	return output, nil
 }
 
-//convertStructToObject converts simple struct to graphql object
+// convertStructToObject converts simple struct to graphql object
 func convertStructToObject(
 	objectType reflect.Type) *graphql.Object {
 
@@ -36,7 +36,7 @@ func convertStructToObject(
 	)
 }
 
-//convertStruct converts struct to graphql fields
+// convertStruct converts struct to graphql fields
 func convertStruct(objectType reflect.Type) graphql.Fields {
 	fields := graphql.Fields{}
 
@@ -56,7 +56,7 @@ func convertStruct(objectType reflect.Type) graphql.Fields {
 	return fields
 }
 
-//getFieldType Converts object to a graphQL field type
+// getFieldType Converts object to a graphQL field type
 func getFieldType(object reflect.StructField) graphql.Output {
 
 	isID, ok := object.Tag.Lookup("unique")
@@ -83,7 +83,7 @@ func getFieldType(object reflect.StructField) graphql.Output {
 	return output
 }
 
-//convertSimpleType converts simple type  to graphql field
+// convertSimpleType converts simple type  to graphql field
 func convertSimpleType(objectType reflect.Type) (*graphql.Scalar, error) {
 
 	typeMap := map[reflect.Kind]*graphql.Scalar{
@@ -107,7 +107,7 @@ func convertSimpleType(objectType reflect.Type) (*graphql.Scalar, error) {
 	return graphqlType, nil
 }
 
-//getTagValue returns tag value of a struct
+// getTagValue returns tag value of a struct
 func getTagValue(objectType reflect.StructField, tagName string) string {
 	tag := objectType.Tag
 	value, ok := tag.Lookup(tagName)
