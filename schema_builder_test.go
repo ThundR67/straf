@@ -24,7 +24,7 @@ func handler(params graphql.ResolveParams) (interface{}, error) {
 func TestSchemaBuilder(t *testing.T) {
 	assert := assert.New(t)
 	graphQLObject, _ := GetGraphQLObject(user2{})
-	builder := NewSchemaBuilder(graphQLObject, []interface{}{user2{}})
+	builder := NewSchemaBuilder(graphQLObject, user2{})
 	assert.IsType(&SchemaBuilder{}, builder)
 	builder.AddFunction("create", "des", handler)
 

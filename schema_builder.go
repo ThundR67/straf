@@ -7,10 +7,10 @@ import (
 )
 
 // NewSchemaBuilder is used get a new schema builder
-func NewSchemaBuilder(graphQLType graphql.Output, objects []interface{}) *SchemaBuilder {
+func NewSchemaBuilder(graphQLType graphql.Output, object interface{}) *SchemaBuilder {
 	builder := SchemaBuilder{
 		GraphQLType: graphQLType,
-		Objects:     objects,
+		Object:      object,
 	}
 	builder.Init()
 	return &builder
@@ -19,22 +19,23 @@ func NewSchemaBuilder(graphQLType graphql.Output, objects []interface{}) *Schema
 // SchemaBuilder is used to build a schema based on a struct
 type SchemaBuilder struct {
 	GraphQLType graphql.Output
-	Objects     []interface{}
+	Object      interface{}
 	Schema      graphql.Fields
 	args        graphql.FieldConfigArgument
 }
 
 // Init initializes
 func (schemaBuilder *SchemaBuilder) Init() {
-	args := graphql.FieldConfigArgument{}
-	for _, object := range schemaBuilder.Objects {
-		for key, value := range getArgs(object) {
-			args[key] = value
-		}
-	}
-	schemaBuilder.args = args
+	schemaBuilder.args = graphql.FieldConfigArgument{}
+	schemaBuilder.AddArgumentsFromStruct(schemaBuilder.Object)
 	schemaBuilder.Schema = graphql.Fields{}
-	return
+}
+
+//AddArgumentsFromStruct is used to add arguments from a struct
+func (schemaBuilder *SchemaBuilder) AddArgumentsFromStruct(object interface{}) {
+	for key, value := range getArgs(object) {
+		schemaBuilder.args[key] = value
+	}
 }
 
 // AddFunction adds a function

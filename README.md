@@ -43,7 +43,7 @@ func main() {
     // GetGraphQLObject will convert golang struct to a graphQL object
     userType, err := straf.GetGraphQLObject(User{})
 
-    builder := straf.NewSchemaBuilder(userType, []interface{User{}, Object2}) // You can add multiple objects to schema builder
+    builder := straf.NewSchemaBuilder(userType, User{}) // You can add multiple objects to schema builder.AddArgumentsFromStruct(object2{}) // You can use this function to add more arguments from a struct
     builder.AddFunction("CreateUser", 
                         "Adds a user to database",
                         func(params graphql.ResolveParams) (interface{}, error)) {
