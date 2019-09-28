@@ -6,12 +6,26 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
+type middlewareType func(func(graphql.ResolveParams) (interface{}, error), graphql.ResolveParams) (interface{}, error)
+
 // NewSchemaBuilder is used get a new schema builder
-func NewSchemaBuilder(graphQLType graphql.Output, object interface{}) *SchemaBuilder {
+func NewSchemaBuilder(
+	graphQLType graphql.Output,
+	object interface{},
+	middlewareArg ...middlewareType) *SchemaBuilder {
+
+	var middleware middlewareType
+
+	if middlewareArg != nil {
+		middleware = middlewareArg[0]
+	}
+
 	builder := SchemaBuilder{
 		GraphQLType: graphQLType,
 		Object:      object,
+		middleware:  middleware,
 	}
+
 	builder.Init()
 	return &builder
 }
@@ -22,6 +36,7 @@ type SchemaBuilder struct {
 	Object      interface{}
 	Schema      graphql.Fields
 	args        graphql.FieldConfigArgument
+	middleware  middlewareType
 }
 
 // Init initializes
@@ -44,11 +59,21 @@ func (schemaBuilder *SchemaBuilder) AddFunction(
 	description string,
 	function func(graphql.ResolveParams) (interface{}, error)) {
 
+	var functionToAdd func(graphql.ResolveParams) (interface{}, error)
+
+	if schemaBuilder.middleware != nil {
+		functionToAdd = func(params graphql.ResolveParams) (interface{}, error) {
+			return schemaBuilder.middleware(function, params)
+		}
+	} else {
+		functionToAdd = function
+	}
+
 	schemaBuilder.Schema[name] = &graphql.Field{
 		Type:        schemaBuilder.GraphQLType,
 		Description: description,
 		Args:        schemaBuilder.args,
-		Resolve:     function,
+		Resolve:     functionToAdd,
 	}
 }
 

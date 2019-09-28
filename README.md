@@ -43,7 +43,9 @@ func main() {
     // GetGraphQLObject will convert golang struct to a graphQL object
     userType, err := straf.GetGraphQLObject(User{})
 
-    builder := straf.NewSchemaBuilder(userType, User{}) // You can add multiple objects to schema builder.AddArgumentsFromStruct(object2{}) // You can use this function to add more arguments from a struct
+    builder := straf.NewSchemaBuilder(userType, User{})
+    
+    builder.AddArgumentsFromStruct(object2{}) // You can use this function to add more arguments from a struct
     builder.AddFunction("CreateUser", 
                         "Adds a user to database",
                         func(params graphql.ResolveParams) (interface{}, error)) {
@@ -55,5 +57,28 @@ func main() {
     // You can then use this schema
 }
 ```
+
+### Using Middleware In Schema Builder
+```go
+
+func middleware(function func(graphql.ResolveParams) (interface{}, error), params graphql.ResolveParams) (interface{}, error) {
+
+    fmt.Println("This function will run as a middleware")
+
+    return function(params)
+}
+
+func main() {
+    builder := straf.NewSchemaBuilder(userType, User{}, middleware)
+
+    builder.AddFunction("SomeFunction", 
+                        "Does Something",
+                        someFunction)
+
+   // Here the middleware function would run everytime before someFunction. middleware function would act as a middleware to all functions added to schema builder.
+}
+
+```
+
 ## Author
 Roshan Jignesh Mehta - sonicroshan122@gmail.com
